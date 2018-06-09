@@ -1,0 +1,11 @@
+Install Centos as per https://www.tecmint.com/centos-7-installation/ and prepare base system for Consul and Nomad masters.
+
+# yum update
+# yum install nano wget unzip epel-release htop
+# systemctl disable firewalld
+# systemctl stop firewalld
+
+# cp /etc/localtime /root/old.timezone
+# rm /etc/localtime
+# ln -s /usr/share/zoneinfo/Africa/Johannesburg /etc/localtime
+# date [Verify the Date]
