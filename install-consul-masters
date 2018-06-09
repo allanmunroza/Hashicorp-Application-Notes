@@ -1,0 +1,53 @@
+In my environment I have 3 Centos 7 masters running in Hyper V
+
+The masters nodes ip's is 
+SIT-MASTER-N1 172.16.2.125
+SIT-MASTER-N2 172.16.2.126
+SIT-MASTER-N3 172.16.2.127
+
+1) Prepare the Folder Structure
+# mkdir /usr/nomad
+# cd /usr/nomad
+# wget https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip
+# unzip consul_1.1.0_linux_amd64.zip
+# mv consul /usr/bin
+# mkdir /tmp/consul
+# mkdir /etc/consul
+
+2) Create a Service so Consul Master start on server reboot
+# nano /lib/systemd/system/consul.service
+	[Unit]
+	Description=consul
+        After=network-online.target
+	
+  [Service]
+	ExecStart=/usr/bin/consul agent -config-dir /etc/consul
+	KillSignal=SIGINT
+ 
+  [Install]
+  WantedBy=network-online.target
+
+3) Create a Config file for the Consul server to bootstrap the server node. (Note: Update details your IP settings.)
+# nano /etc/consul/server.json
+{
+  "datacenter": "duferco",
+  "data_dir": "/tmp/consul",
+  "log_level": "INFO",
+  "node_name": "sit-master-m1",
+  "server": true,
+  "bootstrap_expect": 3,
+  "client_addr": "0.0.0.0",
+  "advertise_addr": "172.16.2.125",
+  "advertise_addr_wan": "172.16.2.125",
+  "enable_script_checks":"true",
+  "bind_addr": "172.16.2.125",
+  "ui": true
+}
+
+4) Enable and start the Service. Verify and fix any errors.
+# systemctl start consul
+# systemctl enable consul
+# journalctl -fu consul {Check the Logs for errors}
+
+5) After all 3 nodes is setup then join by running
+# consul join 172.16.2.125
