@@ -1,0 +1,59 @@
+Install Centos and then Consul. 
+
+1) Download and create Nomad folder structure
+# wget https://releases.hashicorp.com/nomad/0.8.3/nomad_0.8.3_linux_amd64.zip
+# unzip nomad_0.8.3_linux_amd64.zip
+# mv nomad /usr/bin
+# mkdir /tmp/nomad
+# mkdir /etc/nomad
+
+2) Create the service so Nomad can restart on server reboot
+# nano /lib/systemd/system/nomad.service
+[Unit]
+Description=nomad
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/nomad agent -config /etc/nomad
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=network-online.target
+
+3) Create the Nomad Service Config File. Update IP to yours
+# nano /etc/nomad/server.hcl
+log_level = "INFO"
+data_dir = "/tmp/nomad"
+bind_addr = "172.16.2.126"
+region = "za"
+datacenter = "duferco"
+leave_on_terminate = true
+advertise {
+  http =  "172.16.2.126:4646"
+  rpc =   "172.16.2.126:4647"
+  serf =  "172.16.2.126:4648"
+}
+
+server {
+  enabled = true
+  bootstrap_expect = 3
+}
+
+consul {
+  server_service_name = "nomad"
+  server_auto_join = true
+  client_service_name = "nomad-client"
+  client_auto_join = true
+  auto_advertise = true
+}
+
+4) Enable the service and check for errors.
+# systemctl start nomad
+# systemctl enable nomad
+# journalctl -fu nomad [To Check the Logs]
+
+5) run command and check that member servers are up.
+# nomad server members
+
+7) Web UI can be found at 
+http://172.16.2.125:4646/ui/clients
