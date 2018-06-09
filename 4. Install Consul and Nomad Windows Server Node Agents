@@ -23,16 +23,19 @@ Sample: This is in Job to run on a e.g. specific machine
     "blade" = "4"
     "os" = "win1803"
     "use" = "compute"
+1) Install Docker
+Install-Module DockerMsftProvider -Force
+Install-Package Docker -ProviderName DockerMsftProvider -Force
 
-1) Install Chocolatey ton install the Consul and Nomad as a service
+2) Install Chocolatey ton install the Consul and Nomad as a service
 # iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
 # choco install -y nssm
 
-2) ---------------------- Install the Windows Agents - Consul -------------------------------------------
-2.1) Install Consul as a service to restart on reboot.
+3) ---------------------- Install the Windows Agents - Consul -------------------------------------------
+3.1) Install Consul as a service to restart on reboot.
 # nssm install Consul C:\consul\consul.exe agent -config-dir C:\consul\etc\ 
 
-2.2) Create the Consul service config file
+3.2) Create the Consul service config file
 # New-Item C:\consul\etc\config.json -type file
 {
  "bind_addr": "172.16.2.118",
@@ -50,11 +53,11 @@ Sample: This is in Job to run on a e.g. specific machine
     ]
  }
 
-3)  ---------------------- Install the Windows Agents - Nomad-------------------------------------------
-3.1 Create the Nomad Service
+4)  ---------------------- Install the Windows Agents - Nomad-------------------------------------------
+4.1 Create the Nomad Service
 # nssm install Nomad C:\nomad\nomad.exe agent -config=C:\nomad\etc\ 
 
-3.2 Create the Nomad service config file.
+4.2 Create the Nomad service config file.
 # New-Item C:\nomad\etc\server.hcl -type file
 
 log_level = "INFO"
@@ -85,6 +88,6 @@ consul {
   auto_advertise = true
 }
 
-4) Login to Web UI for Consul and Nomad and check if Nodes are added.
+5) Login to Web UI for Consul and Nomad and check if Nodes are added.
 Consul: http://172.16.2.125:8500/ui
 Named:  http://172.16.2.125:4646/ui
