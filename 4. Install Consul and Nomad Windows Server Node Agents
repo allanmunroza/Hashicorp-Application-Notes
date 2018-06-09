@@ -24,13 +24,15 @@ Sample: This is in Job to run on a e.g. specific machine
     "os" = "win1803"
     "use" = "compute"
 
-1) ---------------------- Install the Windows Agents - Consul -------------------------------------------
-1.1) Install Consul as a service to restart on reboot.
+1) Install Chocolatey ton install the Consul and Nomad as a service
 # iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
 # choco install -y nssm
+
+2) ---------------------- Install the Windows Agents - Consul -------------------------------------------
+2.1) Install Consul as a service to restart on reboot.
 # nssm install Consul C:\consul\consul.exe agent -config-dir C:\consul\etc\ 
 
-1.2) Create the Consul service config file
+2.2) Create the Consul service config file
 # New-Item C:\consul\etc\config.json -type file
 {
  "bind_addr": "172.16.2.118",
@@ -48,11 +50,11 @@ Sample: This is in Job to run on a e.g. specific machine
     ]
  }
 
-2  ---------------------- Install the Windows Agents - Nomad-------------------------------------------
-2.1 Create the Nomad Service
+3)  ---------------------- Install the Windows Agents - Nomad-------------------------------------------
+3.1 Create the Nomad Service
 # nssm install Nomad C:\nomad\nomad.exe agent -config=C:\nomad\etc\ 
 
-2.2 Create the Nomad service config file.
+3.2 Create the Nomad service config file.
 # New-Item C:\nomad\etc\server.hcl -type file
 
 log_level = "INFO"
@@ -83,6 +85,6 @@ consul {
   auto_advertise = true
 }
 
-3) Login to Web UI for Consul and Nomad and check if Nodes are added.
+4) Login to Web UI for Consul and Nomad and check if Nodes are added.
 Consul: http://172.16.2.125:8500/ui
 Named:  http://172.16.2.125:4646/ui
