@@ -1,0 +1,88 @@
+From Powershell as Administrator run the following commands.
+
+Below is my Hardware config used for the meta data in Nomad config file
+
+Server Name     IP            Processors   Memory (GB)    OS     LOCATION    RACK        CHASSIS      BLADE   USE
+--------------- ------------  ------------ ----------- --------- --------- --------- ---------------  ----- -------
+SIT-CLUSTER-WN1 172.16.2.111  16           40            win1803 it        IBM Rack  IBM Bladecentre  8     General
+SIT-CLUSTER-WN2 172.16.2.112  16           40            win1803 it        IBM Rack  IBM Bladecentre  9     General
+SIT-CLUSTER-WN3 172.16.2.113  16           40            win1803 it        IBM Rack  IBM Bladecentre  10    General
+SIT-CLUSTER-WN4 172.16.2.114  16           40            win1803 security  IBM Rack  IBM Bladecentre  2     General
+SIT-CLUSTER-WN5 172.16.2.115  16           40            win1803 security  IBM Rack  IBM Bladecentre  3     General
+SIT-CLUSTER-WN6 172.16.2.116  32           230           win1803 security  IBM Rack  Dell             1     Compute
+SIT-CLUSTER-WN7 172.16.2.118  24           143           win1803 it        IBM Rack  IBM Dataplex     1     Compute
+
+SIT-CLUSTER-LN1 172.16.2.119  2            10            centos7 security  IBM Rack  IBM Bladecentre  1     General
+SIT-CLUSTER-LN2 172.16.2.120  2            10            centos7 security  IBM Rack  IBM Bladecentre  2     General
+SIT-CLUSTER-LN3 172.16.2.121  2            10            centos7 security  IBM Rack  IBM Bladecentre  3     General
+
+Sample: This is in Job to run on a e.g. specific machine 
+    "location" = "security"
+    "rack" = "IBM Rack"
+    "chassis" = "IBM Blade Centre"
+    "blade" = "4"
+    "os" = "win1803"
+    "use" = "compute"
+
+1) ---------------------- Install the Windows Agents - Consul -------------------------------------------
+1.1) Install Consul as a service to restart on reboot.
+# iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+# choco install -y nssm
+# nssm install Consul C:\consul\consul.exe agent -config-dir C:\consul\etc\ 
+
+1.2) Create the Consul service config file
+# New-Item C:\consul\etc\config.json -type file
+{
+ "bind_addr": "172.16.2.118",
+ "datacenter": "duferco",
+ "data_dir": "c:/consul/data",
+ "log_level": "INFO",
+ "enable_debug": false
+ "node_name": "SIT-CLUSTER-WN5",
+ "server": false,
+ "rejoin_after_leave": true,
+ "retry_join": [
+    "172.16.2.125", 
+    "172.16.2.126", 
+    "172.16.2.126"
+    ]
+ }
+
+2  ---------------------- Install the Windows Agents - Nomad-------------------------------------------
+2.1 Create the Nomad Service
+# nssm install Nomad C:\nomad\nomad.exe agent -config=C:\nomad\etc\ 
+
+2.2 Create the Nomad service config file.
+# New-Item C:\nomad\etc\server.hcl -type file
+
+log_level = "INFO"
+data_dir = "c:\\nomad\\data"
+bind_addr = "172.16.2.118"
+region = "za"
+datacenter = "duferco"
+leave_on_terminate = true
+
+client {
+  enabled = true
+
+  meta {
+    "location" = "security"
+    "rack" = "IBM Rack"
+    "chassis" = "IBM Blade Centre"
+    "blade" = "4"
+    "os" = "win1803"
+    "use" = "compute"
+  }
+}
+
+consul {
+  server_service_name = "nomad"
+  server_auto_join = true
+  client_service_name = "nomad-client"
+  client_auto_join = true
+  auto_advertise = true
+}
+
+3) Login to Web UI for Consul and Nomad and check if Nodes are added.
+Consul: http://172.16.2.125:8500/ui
+Named:  http://172.16.2.125:4646/ui
