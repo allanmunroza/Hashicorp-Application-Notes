@@ -51,3 +51,6 @@ SIT-MASTER-N3 172.16.2.127
 
 5) After all 3 nodes is setup then join by running
 # consul join 172.16.2.125
+
+6) Web UI can be found at
+http://172.16.2.125:8500/ui
