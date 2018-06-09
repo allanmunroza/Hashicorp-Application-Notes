@@ -1,4 +1,9 @@
-Install Centos and then Consul. 
+Install Consul Step 2 before Nomad install for auto discovery of masters.
+
+The masters nodes ip's is 
+SIT-MASTER-N1 172.16.2.125
+SIT-MASTER-N2 172.16.2.126
+SIT-MASTER-N3 172.16.2.127
 
 1) Download and create Nomad folder structure
 # wget https://releases.hashicorp.com/nomad/0.8.3/nomad_0.8.3_linux_amd64.zip
