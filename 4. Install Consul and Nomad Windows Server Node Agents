@@ -27,6 +27,9 @@ Sample: This is in Job to run on a e.g. specific machine
 Install-Module DockerMsftProvider -Force
 Install-Package Docker -ProviderName DockerMsftProvider -Force
 
+Restart Server
+docker network create -d transparent dsplan
+
 2) Install Chocolatey ton install the Consul and Nomad as a service
 # iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
 # choco install -y nssm
