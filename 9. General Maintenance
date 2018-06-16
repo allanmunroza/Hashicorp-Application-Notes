@@ -1,0 +1,2 @@
+1) Remove Dead Jobs / Servers. On master node run
+# curl -X PUT http://localhost:4646/v1/system/gc
