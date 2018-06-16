@@ -1,2 +1,4 @@
 1) Remove Dead Jobs / Servers. On master node run
+# nomad job status [List all Jobs and find with status dead]
+# nomad job stop <ID of Job> [Run for each Job that you want to delete out of system.]
 # curl -X PUT http://localhost:4646/v1/system/gc
